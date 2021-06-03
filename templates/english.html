@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>英语四六级词表</title>
+</head>
+<body>
+<h1>英语四六级词表</h1>
+<form action="/search">
+    <input type="text"  name="wanted"  value="" default="apple">
+    <input type ="submit" value="搜索">
+</form>
+{% for r in rs%}
+{{r}}<br>
+{%endfor%}
+</body>
+</html>
