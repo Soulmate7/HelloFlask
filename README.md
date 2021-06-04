@@ -2,7 +2,16 @@
 
 > 本项目用于学习使用Flask框架搭建不同功能的网页,仅供参考，欢迎交流
 
-[toc]
+- [简介](#简介)
+- [HelloFlask](#HelloFlask)
+- [Flask框架之模版](#Flask框架之模版)
+- [添加人脸识别系统](#添加人脸识别系统)
+- [Flask框架之数据库](#Flask框架之数据库)
+    - [连接数据库](#连接数据库)
+        - [flask_sqlalchemy](#flask_sqlalchemy)
+        - [pymysql](#pymysql)
+- [参考资料](#参考资料)
+
 ## 简介
 Flask支持各种关系数据库，也支持图数据库Neo4J，扩展功能交友给第三方开发
 若你不仅仅只是想编辑代码文档，而是开发出一款集成软件，那么Flask就是一个好的选择
@@ -152,9 +161,141 @@ if __name__=='__main__':
 
 ## Flask框架之数据库
 
+- 模块安装
+
+``` bash
+pip install flask_sqlalchemy
+pip install pymysql
+```
+
+Flask-SQLAlchemy 是一个 Flask 扩展， 它简化了在 Flask 应用程序中对SQLAlchemy的使用。
+
+### 连接数据库
+
+#### flask_sqlalchemy
+
+``` python
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+app=Flask(__name__)
+
+app.config['SECRET_KEY']='yoursecret'
+app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://root:yoursecret@127.0.0.1:3306/DataVisual'
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN']=True
+db=SQLAlchemy(app)
+#用户名:root
+#密码:yoursecret
+#IP地址:127.0.0.1
+#端口:3306
+#数据库名:DataVisual
+```
+
+- 创建数据表
+``` python
+#创建数据表roles
+class Role(db.Model):
+    __tablename__='roles'
+    id=db.Column(db.Integer,primary_key=True)
+    name=db.Column(db.String(64),unique=True)
+    users=db.relationship('User',backref='role',lazy='dynamic')
+
+    def __repr__(self):#显示一个可读字符串
+        return '<Role %r>' %self.name
+
+#创建数据表users
+class User(db.Model):
+    __tablename__='users'
+    id=db.Column(db.Integer,primary_key=True)
+    username=db.Column(db.String(64),unique=True,index=True)
+    role_id=db.Column(db.Integer,db.ForeignKey('roles.id'))
+
+    def __repr__(self):
+        return '<User %r>'%self.username
+
+#执行数据库
+if __name__=='__main__':
+    db.drop_all()
+    db.create_all()
+    app.run()
+```
+
+- 增删改查
+``` python
+#增
+admin_role=Role(name='Admin')
+user_role=Role(name='User')
+user_cuc=User(username='cuc',role=admin_role)
+user_dviz=User(username='dviz',role=user_role)
+db.session.add_all([admin_role,user_role,user_cuc,user_dviz])
+#提交会话到数据库
+db.session.commit()
+
+#改
+admin_role.name='Administrator'
+db.session.add(admin_role)
+db.session.commit()
+
+#删
+db.session.delete(user_role)#从数据库中删除'user'角色
+db.session.commit()
+
+#查
+print(user_role)
+print(admin_role)
+print(User.query.filter_by(role=user_role).all())
+```
+
+#### pymysql
+
+现在我们再来使用pymysql模块来进行对数据库的操作
+``` python
+import pymysql
+from flask import Flask,render_template,request
+
+app=Flask(__name__)
+
+@app.route('/search')
+#由于route改变，此时我们的路径就发生了变化:http://127.0.0.1:5000/search
+def search():#查询函数
+    wanted=request.args.get("wanted",type=str)
+    #从模块获取查询单词
+    if wanted == None:
+        wanted='pineapple'#默认单词
+
+    db=pymysql.connect(host='localhost',user='root',passwd="z1012194891",db="DataVisual",charset="utf8")
+    #链接数据库，注意参数一定要按照顺序显示，前面添加参数名
+    cursor=db.cursor()
+    try:
+        sql="SELECT * FROM DataVisual.map_enword where english like '%"+wanted+"%'"
+        #执行sql语句
+        cursor.execute(sql)
+        #返回结果
+        rs=cursor.fetchall()
+        rs=list(rs)
+        print(rs)
+    except:
+        #错误处理
+        rs='db-error'
+        print('py-db-error')
+    #断开数据库连接
+    db.close()
+    #将结果返回到模版中渲染，并传入查询结果
+    return render_template('english.html',rs=rs)
+
+if __name__=='__main__':
+    app.run(debug=True)
+```
+
+- 效果
+
+查询含有tion的单词
+
+![单词查询](image/english.png)
+
 ---
 
-## 链接数据库并返回英文单词搜索结果
+后续待更新...
 
 ---
 

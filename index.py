@@ -6,7 +6,7 @@ app=Flask(__name__)
 @app.route('/')
 def index():
     outname=detect('static/101.png')
-    return render_template('index.html',outname=outname)
+    return render_template('face.html',outname=outname)
 
 def detect(filename):
     face_cascade = cv2.CascadeClassifier('/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/cv2/data/haarcascade_frontalface_default.xml')
@@ -18,7 +18,7 @@ def detect(filename):
 
     for (x, y, w, h) in faces:
         img = cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-    outname='static/101.png'
+    outname='static/face.png'
     cv2.imwrite(outname,img)
     return outname
 

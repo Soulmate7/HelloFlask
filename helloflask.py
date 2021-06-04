@@ -7,7 +7,7 @@ app=Flask(__name__)
 @app.route('/')
 def index():
     outname=detect('static/101.png')
-    return render_template('index.html',outname=outname)
+    return render_template('face.html',outname=outname)
 
 def detect(filename):
     img=cv2.imread(filename)
