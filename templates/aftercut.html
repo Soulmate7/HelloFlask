@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>视频切分结果</title>
+</head>
+<body>
+<h1 style=text-align:center;>视频切分结果</h1>
+<p>视频总帧数：{{video_frame_count}}帧</p>
+<p>第一帧经处理后的图片：</p>
+<img src="{{firstframe}}" />
+<form action="/merge">
+        <input type="submit" value="点击查看合并后的视频效果">
+</form>
+</body>
+</html>

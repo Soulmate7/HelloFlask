@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>视频处理</title>
+</head>
+<body>
+<h1 style=text-align:center;>视频处理</h1>
+<form action="/">
+    <input type="text"  name="video_path"  value="" default='static/basketball.mp4'>
+    <input type ="submit" value="上传">
+</form>
+<video style="margin-top:15px;" controls="controls">
+    <source src="{{outname}}" type="video/mp4" />
+</video>
+<form action="/cut">
+        <input type="submit" value="切分视频">
+</form>
+
+
+</body>
+</html>
